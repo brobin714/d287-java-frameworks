@@ -25,7 +25,40 @@ C.  Customize the HTML user interface for your customer’s application. The use
 
 
 D.  Add an “About” page to the application to describe your chosen customer’s company to web viewers and include navigation to and from the “About” page and the main screen.
+<pre>
 
+    CREATE - about.html
+
+        &lt !DOCTYPE html &gt  
+        &lt html lang="en" &gt  
+        &lt head &gt  
+            &lt meta charset="UTF-8" &gt  
+            &lt title &gt  About Us&lt /title &gt  
+        &lt /head &gt  
+        &lt body &gt  
+        
+            &lt p &gt  
+            Robinson's Computer Haven is your shop for all things computer related.
+    Our store is people driven and not profit driven. If we can't help then it's free 99.
+
+            &lt /p &gt  
+        
+            &lt a href="http://localhost:8080/" &gt  Link to Main Screen&lt /a &gt  
+        &lt /body &gt  
+        &lt /html &gt  
+
+    INSERT - mainscreen.html
+    
+        Line 89 to 90 - &lt  a th:href="@{/about}" style="float: right">
+        Go To About Us &lt /a &gt
+
+   CREATE - AboutController, LINES ALL
+
+        @GetMapping("/about")
+    public String getAbout() {
+        return "About";
+
+</pre>
 
 E.  Add a sample inventory appropriate for your chosen store to the application. You should have five parts and five products in your sample inventory and should not overwrite existing data in the database.
 
