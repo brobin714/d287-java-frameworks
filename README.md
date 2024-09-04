@@ -166,7 +166,73 @@ F.  Add a “Buy Now” button to your product list. Your “Buy Now” button m
 •  The “Buy Now” button must be next to the buttons that update and delete products.
 •  The button should decrement the inventory of that product by one. It should not affect the inventory of any of the associated parts.
 •  Display a message that indicates the success or failure of a purchase.
+<pre>
+  CREATE - confirmationbuyproduct.html
 
+        &lt !DOCTYPE html &gt 
+        &lt html lang="en" &gt 
+        &lt head &gt 
+            &lt meta charset="UTF-8" &gt 
+            &lt title &gt Product Purchase Confirmation &lt /title &gt 
+        &lt /head &gt 
+        &lt body &gt 
+        &lt h1 &gt Your product has been purchased. &lt /h1 &gt 
+        
+        &lt a href="http://localhost:8080/" &gt Link to Main Screen &lt /a &gt 
+        &lt /body &gt 
+        &lt /html &gt 
+
+    CREATE - errorbuyproduct.html
+
+         &lt !DOCTYPE html &gt 
+         &lt html lang="en" &gt 
+         &lt head &gt 
+             &lt meta charset="UTF-8" &gt 
+             &lt title &gt Error purchasing product. &lt /title &gt 
+         &lt /head &gt 
+         &lt body &gt 
+         &lt h1 &gt Error purchasing product. Confirm current inventory. &lt /h1 &gt 
+        
+         &lt a href="http://localhost:8080/" &gt Link to Main Screen &lt /a &gt 
+        
+         &lt /body &gt 
+         &lt /html &gt 
+
+    INSERT - mainscreen.html, LINES 85-86
+
+        &lt a th:href="@{/buyproduct(productID=${tempProduct.id})}" class="btn btn-primary btn-sm mb-3"
+        onclick="if(!(confirm('Are you sure you want to purchase this product?')))return false" &gt Buy Now &lt /a &gt 
+    
+    INSERT - product.java, LINES 108-116
+
+        // Instruction F: buyProduct function to decrement inventory
+        // Uses a simple test to ensure product exists before decrementing
+        public boolean buyProduct() {
+            if (this.inv >= 1 ) {
+                this.inv--;
+                return true;
+            } else {
+                return false;
+            }
+        
+        }
+
+    INSERT - AddProductController.java
+
+        LINE 177 - @GetMapping("/buyproduct")
+        LINE 178 - public String buyProduct(@RequestParam("productID") int theId, Model theModel ) {
+        LINE 179 - ProductService productService = context.getBean(ProductServiceImpl.class);
+        LINE 180 - Product product2 = productService.findById(theId);
+        LINE 181 - 
+        LINE 182 - boolean purchaseConfirmation = product2.buyProduct();
+        LINE 183 - if ( purchaseConfirmation ) {
+        LINE 184 -     productService.save(product2);
+        LINE 185 -     return "confirmationbuyproduct";
+        LINE 186 - }
+        LINE 187 - 
+        LINE 188 - return "errorbuyproduct";
+        LINE 189 - }
+</pre>
 
 G.  Modify the parts to track maximum and minimum inventory by doing the following:
 •  Add additional fields to the part entity for maximum and minimum inventory.
