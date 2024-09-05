@@ -348,7 +348,7 @@ H.  Add validation for between or at the maximum and minimum fields. The validat
         import javax.validation.ConstraintValidator;
         import javax.validation.ConstraintValidatorContext;
 
-        public class PartInventoryMinimumValidator implements ConstraintValidator<ValidPartInventoryMinimum, Part> {
+        public class PartInventoryMinimumValidator implements ConstraintValidator<ValidPartInventoryMinimum Part> {
             @Autowired
             private ApplicationContext context;
 
@@ -385,8 +385,6 @@ H.  Add validation for between or at the maximum and minimum fields. The validat
             Class<?> [] groups() default {};
             Class<? extends Payload> [] payload() default {};
             }
-        }
-
 
 
 </pre>
@@ -485,7 +483,28 @@ would have been triggered by PartInventoryMinimumValidator.
 I.  Add at least two unit tests for the maximum and minimum fields to the PartTest class in the test package.
 <pre>
 
+  INSERT - PartTest.java, LINES 160-176
+        @Test
+        void getMinimum() {
+            int minimum=5;
+            partIn.setMinimum(minimum);
+            assertEquals(minimum, partIn.getMinimum());
+            partOut.setMinimum(minimum);
+            assertEquals(minimum, partOut.getMinimum());
+        }
+    
+        @Test
+        void getMaximum() {
+            int maximum=5;
+            partIn.setMaximum(maximum);
+            assertEquals(maximum, partIn.getMaximum());
+            partOut.setMaximum(maximum);
+            assertEquals(maximum, partOut.getMaximum());
+        }
 
 </pre>
 
 J.  Remove the class files for any unused validators in order to clean your code.
+<pre>
+
+</pre>
