@@ -54,9 +54,19 @@ D.  Add an “About” page to the application to describe your chosen customer�
 
    CREATE - AboutController, LINES ALL
 
-        @GetMapping("/about")
+   package com.example.demo.controllers;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class AboutController {
+
+    @GetMapping("/about")
     public String getAbout() {
         return "About";
+    }
+}
 
 </pre>
 
@@ -322,11 +332,160 @@ that is below the minimum or above the maximum, outlined in section H.
 
 H.  Add validation for between or at the maximum and minimum fields. The validation must include the following:
 •  Display error messages for low inventory when adding and updating parts if the inventory is less than the minimum number of parts.
+<pre>
+  INSERT - Part.java, LINES 19-20
+        @ValidPartInventory
+        @ValidPartInventoryMinimum
+
+    CREATE PartInventoryMinimumValidator.java
+
+        package com.example.demo.validators;
+
+        import com.example.demo.domain.Part;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.ApplicationContext;
+
+        import javax.validation.ConstraintValidator;
+        import javax.validation.ConstraintValidatorContext;
+
+        public class PartInventoryMinimumValidator implements ConstraintValidator<ValidPartInventoryMinimum, Part> {
+            @Autowired
+            private ApplicationContext context;
+
+            public static  ApplicationContext myContext;
+
+            @Override
+            public void initialize(ValidPartInventoryMinimum constraintAnnotation) {
+             ConstraintValidator.super.initialize(constraintAnnotation);
+             }
+
+            @Override
+            public boolean isValid(Part part, ConstraintValidatorContext constraintValidatorContext) {
+             return part.getInv() > part.getMinimum();
+             }
+        }
+
+    CREATE ValidPartInventoryMinimum.java
+        package com.example.demo.validators;
+
+
+        import javax.validation.Constraint;
+        import javax.validation.Payload;
+        import java.lang.annotation.ElementType;
+        import java.lang.annotation.Retention;
+        import java.lang.annotation.RetentionPolicy;
+        import java.lang.annotation.Target;
+
+        @Constraint(validatedBy = {PartInventoryMinimumValidator.class})
+        @Target({ElementType.TYPE})
+        @Retention(RetentionPolicy.RUNTIME)
+        
+        public @interface ValidPartInventoryMinimum {
+            String message() default "Inventory cannot be lower than required minimum";
+            Class<?> [] groups() default {};
+            Class<? extends Payload> [] payload() default {};
+            }
+        }
+
+
+
+</pre>
 •  Display error messages for low inventory when adding and updating products lowers the part inventory below the minimum.
+<pre>
+  NOTE: There isn't a validator here because the requirements of section F is that the "Buy Now" button doesn't change the 
+inventory of the associated parts. 
+
+If I were to implement this feature, I would have needed to modify the buyProduct() 
+function that I created to decrement the inventory of the parts as well like so:
+
+    public boolean buyProduct() {
+        if (this.inv >= 1 ) {
+            this.inv--;
+
+            for(Part part:this.getParts()){
+                if (part.getInv() >= 1) {
+                    part.setInv(part.getInv() - 1);
+                } else {
+                    return false;
+                }
+            }
+    }
+
+Then, I could have modified the errorbuypart.html to include the validation error that
+would have been triggered by PartInventoryMinimumValidator.
+
+</pre>
+
 •  Display error messages when adding and updating parts if the inventory is greater than the maximum.
 
+<pre>
+ CREATE - PartInventoryValidator.java
+
+        package com.example.demo.validators;
+        
+        import com.example.demo.domain.Part;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.context.ApplicationContext;
+        
+        import javax.validation.ConstraintValidator;
+        import javax.validation.ConstraintValidatorContext;
+        
+        /**
+         *
+         *
+         *
+         *
+         */
+        public class PartInventoryValidator implements ConstraintValidator &lt ValidPartInventory, Part &gt {
+            @Autowired
+            private ApplicationContext context;
+        
+            public static  ApplicationContext myContext;
+        
+            @Override
+            public void initialize(ValidPartInventory constraintAnnotation) {
+                ConstraintValidator.super.initialize(constraintAnnotation);
+            }
+        
+            @Override
+            public boolean isValid(Part part, ConstraintValidatorContext constraintValidatorContext) {
+                return part.getInv() <= part.getMaximum();
+            }
+        }
+
+    CREATE - ValidPartInventory.java
+
+        package com.example.demo.validators;
+        
+        import javax.validation.Constraint;
+        import javax.validation.Payload;
+        import java.lang.annotation.ElementType;
+        import java.lang.annotation.Retention;
+        import java.lang.annotation.RetentionPolicy;
+        import java.lang.annotation.Target;
+        
+        /**
+         *
+         *
+         *
+         *
+         */
+        @Constraint(validatedBy = {PartInventoryValidator.class})
+        @Target({ElementType.TYPE})
+        @Retention(RetentionPolicy.RUNTIME)
+        public @interface ValidPartInventory {
+            String message() default "Inventory cannot exceed maximum value";
+            Class<?> [] groups() default {};
+            Class<? extends Payload> [] payload() default {};
+        }
+
+
+</pre>
 
 I.  Add at least two unit tests for the maximum and minimum fields to the PartTest class in the test package.
+<pre>
 
+
+</pre>
 
 J.  Remove the class files for any unused validators in order to clean your code.
