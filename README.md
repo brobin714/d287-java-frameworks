@@ -507,4 +507,22 @@ I.  Add at least two unit tests for the maximum and minimum fields to the PartTe
 J.  Remove the class files for any unused validators in order to clean your code.
 <pre>
 
+Unused validators review:
+    ValidDeletePart (DeletePartValidator) - Used in Part.java 
+        Prevents parts from being deleted if they're associated with a product
+
+    ValidEnufParts (EnufPartsValidator) - Used in Product.java
+        Prevents adding additional product inventory if there isn't enough associated parts inventory
+
+    ValidPartInventory (PartInventoryValidator) - Used in Part.java
+        Prevents adding additional part inventory if it exceeds the specified max
+
+    ValidPartInventoryMinimum (PartInventoryMinimumValidator) - Used in Part.java
+        Prevents modifying part inventory if it the changes puts it below the min threshold
+
+    ValidProductPrice (PriceProductValidator) - Used in Product.java
+        Prevents charging less for the product than the sum cost of its associated parts
+
+All 5 validators in the project are being used. 
+
 </pre>
